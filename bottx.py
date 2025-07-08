@@ -15,7 +15,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.reply_to(message, "Chào mừng bạn đến với Bot giải mã MD5"!)
-"Vui lòng nhập key bằng lệnh /key để tiếp tục.")
+"Vui lòng nhập key bằng lệnh /key để tiếp tục."
 
 @bot.message_handler(commands=['key'])
 def key_handler(message):
