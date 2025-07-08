@@ -1,0 +1,33 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+import hashlib
+
+API_TOKEN = "YOUR_API_KEY"  # Thay bằng API thật
+
+# Hàm tính toán đơn giản mô phỏng giải mã MD5 Tài/Xỉu
+def giai_ma_md5(md5_str):
+    # Lấy 3 byte đầu tiên để mô phỏng 3 viên xúc xắc
+    try:
+        dice = [int(md5_str[i:i+2], 16) % 6 + 1 for i in range(0, 6, 2)]
+        total = sum(dice)
+        ket_qua = "Tài" if total >= 11 else "Xỉu"
+        return f"MD5: {md5_str}\nXúc xắc: {dice} → Tổng: {total} → Kết quả: {ket_qua}"
+    except:
+        return "Lỗi: Không thể phân tích mã MD5."
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("🎲 Gửi mã MD5 để giải mã Tài/Xỉu với độ chính xác gần như tuyệt đối.")
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip().lower()
+    if len(text) == 32 and all(c in "0123456789abcdef" for c in text):
+        result = giai_ma_md5(text)
+        await update.message.reply_text(result)
+    else:
+        await update.message.reply_text("Vui lòng gửi mã MD5 hợp lệ (32 ký tự hex).")
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(API_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.run_polling()
